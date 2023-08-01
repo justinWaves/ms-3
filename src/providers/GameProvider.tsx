@@ -87,17 +87,16 @@ function GameProvider({ children }: IGameProvider) {
   };
 
   const placeMines = (numberOfMines: number, matrix: ICell[][]) => {
-    let minesToPlace = numberOfMines;
+    let minesToPlace = numberOfMines
 
-    while (minesToPlace > 0) {
-      let row = Math.floor(Math.random() * matrix.length);
-      let col = Math.floor(Math.random() * matrix[0].length);
+    while(minesToPlace > 0) {
+        let row = Math.floor(Math.random() * matrix.length)
+        let col = Math.floor(Math.random() * matrix[0].length)
 
-      if (!matrix[row][col].isMine) {
-        matrix[row][col].isMine = true;
-        minesToPlace--;
-      }
-      
+        if(!matrix[row][col].isMine){
+            matrix[row][col].isMine = true
+            minesToPlace --;
+        }
     }
   };
 
@@ -144,25 +143,23 @@ function GameProvider({ children }: IGameProvider) {
     col: number,
     matrix: ICell[][]
   ) => {
-    const copyOfBoard = [...gameState];
-    const stack = [[row, col]];
+    const stack = [[row, col]]
 
     while (stack.length > 0) {
-      const [currentRow, currentCol] = stack.pop() || [];
-      const neighbors = returnNeighborsCells(currentRow, currentCol, matrix);
+        const [currentRow, currentCol] = stack.pop() || []
+        const neighbors = returnNeighborsCells(currentRow, currentCol, matrix)
 
-      for (let neighbor of neighbors) {
-        const [neighborRow, neighborCol] = neighbor;
-        if (copyOfBoard[neighborRow][neighborCol].isRevealed) continue;
-        if (!copyOfBoard[neighborRow][neighborCol].isMine) {
-          copyOfBoard[neighborRow][neighborCol].isRevealed = true;
+        for (let neighbor of neighbors) {
+            const [neighborRow, neighborCol] = neighbor
+            if (matrix[neighborRow][neighborCol].isRevealed) continue;
+            if (!matrix[neighborRow][neighborCol].isMine) {
+                matrix[neighborRow][neighborCol].isRevealed = true
+            }
+            if (matrix[neighborRow][neighborCol].value === 0){
+                stack.push(neighbor)
+            }
         }
-        if (copyOfBoard[neighborRow][neighborCol].value === 0) {
-          stack.push(neighbor);
-        }
-      }
     }
-    setGameState(copyOfBoard);
   };
 
   const handleLeftClick = (row: number, col: number) => {
@@ -176,6 +173,7 @@ function GameProvider({ children }: IGameProvider) {
     }
     if (copyOfBoard[row][col].value === 0) {
       expandZeroValueCells(row, col, copyOfBoard);
+      
     }
     setGameState(copyOfBoard);
     checkForWin();
@@ -203,7 +201,7 @@ function GameProvider({ children }: IGameProvider) {
     const flattenedBoard = copyOfBoard.flat();
     let counter = 0;
     flattenedBoard.forEach((cell) => {
-        if (cell.isRevealed) counter++;
+        if (!cell.isRevealed) counter++;
         
     })
     if (counter === numberOfMines){
