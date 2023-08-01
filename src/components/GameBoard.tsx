@@ -9,6 +9,8 @@ function GameBoard() {
     numberOfCols,
     numberOfRows,
     numberOfMines,
+    isGameWon,
+    isGameOver,
     setGameState,
   } = useGameContext();
 
@@ -18,6 +20,11 @@ function GameBoard() {
   }, []);
 
   return (
+    <>
+    <div className="h-20">
+{isGameWon && <h1 className="text-green-600 text-center text-5xl"> YOU WIN 🎊</h1>}
+{isGameOver && <h1 className="text-red-600 text-center text-5xl"> YOU LOSE 😭</h1>}
+    </div>
     <div className="mx-auto flex">
   {  gameState.map((row, rowIndex)=>
    ( <div key={rowIndex}>
@@ -27,6 +34,7 @@ function GameBoard() {
     </div>)
     ) }
     </div>
+    </>
   );
 }
 

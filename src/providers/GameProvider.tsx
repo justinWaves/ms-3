@@ -13,11 +13,13 @@ interface IGameContext {
   numberOfCols: number;
   numberOfMines: number;
   isGameOver: boolean;
+  isGameWon: boolean;
   setGameState: Dispatch<SetStateAction<ICell[][]>>;
   setNumberOfRows: Dispatch<SetStateAction<number>>;
   setNumberOfCols: Dispatch<SetStateAction<number>>;
   setNumberOfMines: Dispatch<SetStateAction<number>>;
   setIsGameOver: Dispatch<SetStateAction<boolean>>;
+  setIsGameWon:Dispatch<SetStateAction<boolean>>;
   initializeBoard: (rows: number, cols: number, numberOfMines: number) => void;
   handleLeftClick: (rows: number, cols: number) => void;
   handleRightClick: (rows: number, cols: number) => void;
@@ -29,12 +31,14 @@ const defaultContext: IGameContext = {
   numberOfCols: 10,
   numberOfMines: 10,
   isGameOver: false,
+  isGameWon:false,
   setGameState: () => {},
   setNumberOfRows: () => {},
   setNumberOfCols: () => {},
   setNumberOfMines: () => {},
   initializeBoard: () => {},
   setIsGameOver: () => {},
+  setIsGameWon:() => {},
   handleLeftClick: () => {},
   handleRightClick: () => {},
 };
@@ -43,11 +47,12 @@ const GameContext = createContext(defaultContext);
 
 function GameProvider({ children }: IGameProvider) {
   //define state variables
-  const [gameState, setGameState] = useState<ICell[][]>([]);
-  const [numberOfRows, setNumberOfRows] = useState(10);
-  const [numberOfCols, setNumberOfCols] = useState(10);
-  const [numberOfMines, setNumberOfMines] = useState(10);
-  const [isGameOver, setIsGameOver] = useState(false);
+  const [gameState, setGameState] = useState<ICell[][]>(defaultContext.gameState);
+  const [numberOfRows, setNumberOfRows] = useState(defaultContext.numberOfRows);
+  const [numberOfCols, setNumberOfCols] = useState(defaultContext.numberOfCols);
+  const [numberOfMines, setNumberOfMines] = useState(defaultContext.numberOfMines);
+  const [isGameOver, setIsGameOver] = useState(defaultContext.isGameOver);
+  const [isGameWon, setIsGameWon] = useState(defaultContext.isGameWon);
 
   const createCell = (row: number, col: number) => {
     return {
@@ -90,8 +95,9 @@ function GameProvider({ children }: IGameProvider) {
 
       if (!matrix[row][col].isMine) {
         matrix[row][col].isMine = true;
+        minesToPlace--;
       }
-      minesToPlace--;
+      
     }
   };
 
@@ -172,6 +178,7 @@ function GameProvider({ children }: IGameProvider) {
       expandZeroValueCells(row, col, copyOfBoard);
     }
     setGameState(copyOfBoard);
+    checkForWin();
   };
 
   const handleRightClick = (row: number, col: number) => {
@@ -191,6 +198,19 @@ function GameProvider({ children }: IGameProvider) {
     setGameState(copyOfBoard);
   };
 
+  const checkForWin = () =>{
+    const copyOfBoard = [...gameState];
+    const flattenedBoard = copyOfBoard.flat();
+    let counter = 0;
+    flattenedBoard.forEach((cell) => {
+        if (cell.isRevealed) counter++;
+        
+    })
+    if (counter === numberOfMines){
+        setIsGameWon(true)
+    }
+  }
+
   return (
     <GameContext.Provider
       value={{
@@ -199,6 +219,8 @@ function GameProvider({ children }: IGameProvider) {
         numberOfCols,
         numberOfMines,
         isGameOver,
+        isGameWon,
+        setIsGameWon,
         setGameState,
         setNumberOfRows,
         setNumberOfCols,
