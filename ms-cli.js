@@ -48,7 +48,7 @@ function printBoard(board) {
           return cell.value === 0 ? " " : cell.value; // Print the cell value if it's not a mine
         }
       } else {
-        return cell.isFlagged ? "F" : "."; // Print 'F' if flagged, '.' if unrevealed
+        return cell.isFlagged ? "F" : "*"; // Print 'F' if flagged, '.' if unrevealed
       }
     });
 
