@@ -1,13 +1,14 @@
 import React from 'react';
-import './App.css';
+import GameProvider from './providers/GameProvider';
 import GameBoard from './components/GameBoard';
 
 function App() {
   return (
-    <div className="h-screen flex justify-center flex-col">
-      
-      <GameBoard />
-    </div>
+    <GameProvider>
+      <div className="h-screen flex justify-center flex-col">
+        <GameBoard />
+      </div>
+    </GameProvider>
   );
 }
 

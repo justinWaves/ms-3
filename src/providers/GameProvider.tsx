@@ -143,38 +143,53 @@ function GameProvider({ children }: IGameProvider) {
     col: number,
     matrix: ICell[][]
   ) => {
-    const stack = [[row, col]]
+    // First reveal the clicked cell
+    matrix[row][col].isRevealed = true;
+    
+    // If it's not a zero, we're done
+    if (matrix[row][col].value !== 0) return;
+    
+    const stack = [[row, col]];
+    const visited = new Set([`${row},${col}`]);
 
     while (stack.length > 0) {
-        const [currentRow, currentCol] = stack.pop() || []
-        const neighbors = returnNeighborsCells(currentRow, currentCol, matrix)
+      const [currentRow, currentCol] = stack.pop() || [];
+      const neighbors = returnNeighborsCells(currentRow, currentCol, matrix);
 
-        for (let neighbor of neighbors) {
-            const [neighborRow, neighborCol] = neighbor
-            if (matrix[neighborRow][neighborCol].isRevealed) continue;
-            if (!matrix[neighborRow][neighborCol].isMine) {
-                matrix[neighborRow][neighborCol].isRevealed = true
-            }
-            if (matrix[neighborRow][neighborCol].value === 0){
-                stack.push(neighbor)
-            }
+      for (const [neighborRow, neighborCol] of neighbors) {
+        const key = `${neighborRow},${neighborCol}`;
+        if (visited.has(key)) continue;
+        visited.add(key);
+
+        const neighbor = matrix[neighborRow][neighborCol];
+        if (!neighbor.isRevealed && !neighbor.isFlagged && !neighbor.isMine) {
+          neighbor.isRevealed = true;
+          if (neighbor.value === 0) {
+            stack.push([neighborRow, neighborCol]);
+          }
         }
+      }
     }
   };
 
   const handleLeftClick = (row: number, col: number) => {
     const copyOfBoard = [...gameState];
+    
+    // Handle first move
     if (copyOfBoard[row][col].isMine) {
       setIsGameOver(true);
       expandAllCells();
+      return;
     }
-    if (copyOfBoard[row][col].value > 0) {
-      copyOfBoard[row][col].isRevealed = true;
-    }
+
+    // Always reveal the clicked cell first
+    copyOfBoard[row][col].isRevealed = true;
+    
+    // Then handle expansion if needed
     if (copyOfBoard[row][col].value === 0) {
       expandZeroValueCells(row, col, copyOfBoard);
-      
     }
+    
     setGameState(copyOfBoard);
     checkForWin();
   };
