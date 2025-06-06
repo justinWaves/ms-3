@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/ms-test3/static/css/main.f8dc670f.css",
+    "main.js": "/ms-test3/static/js/main.5fe0fc43.js",
+    "index.html": "/ms-test3/index.html",
+    "main.f8dc670f.css.map": "/ms-test3/static/css/main.f8dc670f.css.map",
+    "main.5fe0fc43.js.map": "/ms-test3/static/js/main.5fe0fc43.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f8dc670f.css",
+    "static/js/main.5fe0fc43.js"
+  ]
+}
