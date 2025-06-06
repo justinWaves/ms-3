@@ -3,61 +3,86 @@ import { ICell } from '../types'
 import { useGameContext } from '../providers/GameProvider'
 
 interface CellProps extends ICell {
-  onFirstClick?: () => void;
+  onFirstClick: () => void;
 }
 
-function Cell({row, col, value, isFlagged, isMine, isRevealed, onFirstClick}: CellProps) {
-const {handleLeftClick, handleRightClick} = useGameContext()
+const Cell: React.FC<CellProps> = ({
+  row,
+  col,
+  value,
+  isRevealed,
+  isMine,
+  isFlagged,
+  onFirstClick,
+}) => {
+  const { handleLeftClick, handleRightClick } = useGameContext();
 
-const onLeftClick = () => {
+  const handleClick = () => {
     if (!isRevealed && !isFlagged) {
-      onFirstClick?.();
+      onFirstClick();
+      handleLeftClick(row, col);
     }
-    handleLeftClick(row, col)
-}
+  };
 
-const onRightClick = (e: React.MouseEvent) => {
+  const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
-    handleRightClick(row, col)
-}
+    if (!isRevealed) {
+      handleRightClick(row, col);
+    }
+  };
 
-let numberColor = '';
+  const getCellContent = () => {
+    if (isFlagged) return "🚩";
+    if (!isRevealed) return "";
+    if (isMine) return "💣";
+    if (value === 0) return "";
+    return value.toString();
+  };
 
-switch (value) {
-  case 1:
-    numberColor = 'text-blue-600';
-    break;
-  case 2:
-    numberColor = 'text-green-600';
-    break;
-  case 3:
-    numberColor = 'text-red-600';
-    break;
-  case 4:
-    numberColor = 'text-yellow-600';
-    break;
-  case 5:
-    numberColor = 'text-orange-600';
-    break;
-  case 7:
-    numberColor = 'text-purple-600';
-    break;
-}
+  const getCellColor = () => {
+    if (!isRevealed) return "bg-slate-700";
+    if (isMine) return "bg-red-500";
+    if (value === 0) return "bg-slate-600";
+    return "bg-slate-600";
+  };
+
+  const getTextColor = () => {
+    if (!isRevealed) return "text-white";
+    if (isMine) return "text-white";
+    switch (value) {
+      case 1: return "text-blue-400";
+      case 2: return "text-green-400";
+      case 3: return "text-red-400";
+      case 4: return "text-purple-400";
+      case 5: return "text-yellow-400";
+      case 6: return "text-cyan-400";
+      case 7: return "text-orange-400";
+      case 8: return "text-pink-400";
+      default: return "text-white";
+    }
+  };
 
   return (
-    isRevealed ? 
-      <div className={`${numberColor} w-10 h-10 border bg-slate-300 flex items-center justify-center text-lg font-bold`}>
-        {isMine ? "💣" : value > 0 ? value : ""}
-      </div> 
-      : 
-      <div 
-        className='w-10 h-10 border bg-slate-700 hover:bg-slate-600 cursor-pointer flex items-center justify-center'
-        onClick={onLeftClick} 
-        onContextMenu={onRightClick}
-      >
-        {isFlagged && "🚩"}
-      </div>
-  )
-}
+    <div
+      className={`
+        w-8 h-8 sm:w-10 sm:h-10
+        flex items-center justify-center
+        border border-slate-500
+        ${getCellColor()}
+        ${getTextColor()}
+        font-bold text-lg sm:text-xl
+        cursor-pointer
+        select-none
+        transition-colors duration-200
+        hover:bg-slate-600
+        active:bg-slate-500
+      `}
+      onClick={handleClick}
+      onContextMenu={handleContextMenu}
+    >
+      {getCellContent()}
+    </div>
+  );
+};
 
 export default Cell

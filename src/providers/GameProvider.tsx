@@ -87,16 +87,22 @@ function GameProvider({ children }: IGameProvider) {
   };
 
   const placeMines = (numberOfMines: number, matrix: ICell[][]) => {
-    let minesToPlace = numberOfMines
-
-    while(minesToPlace > 0) {
-        let row = Math.floor(Math.random() * matrix.length)
-        let col = Math.floor(Math.random() * matrix[0].length)
-
-        if(!matrix[row][col].isMine){
-            matrix[row][col].isMine = true
-            minesToPlace --;
-        }
+    let minesToPlace = numberOfMines;
+    const totalCells = matrix.length * matrix[0].length;
+    const availablePositions = Array.from({ length: totalCells }, (_, i) => i);
+    
+    // Shuffle the available positions
+    for (let i = availablePositions.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [availablePositions[i], availablePositions[j]] = [availablePositions[j], availablePositions[i]];
+    }
+    
+    // Place mines in the first numberOfMines positions
+    for (let i = 0; i < numberOfMines; i++) {
+      const position = availablePositions[i];
+      const row = Math.floor(position / matrix[0].length);
+      const col = position % matrix[0].length;
+      matrix[row][col].isMine = true;
     }
   };
 
@@ -210,16 +216,24 @@ function GameProvider({ children }: IGameProvider) {
     setGameState(copyOfBoard);
   };
 
-  const checkForWin = () =>{
+  const checkForWin = () => {
     const copyOfBoard = [...gameState];
     const flattenedBoard = copyOfBoard.flat();
-    let counter = 0;
-    flattenedBoard.forEach((cell) => {
-        if (!cell.isRevealed) counter++;
-        
-    })
-    if (counter === numberOfMines){
-        setIsGameWon(true)
+    
+    // Get all cells
+    const allCells = flattenedBoard.length;
+    const mineCells = flattenedBoard.filter(cell => cell.isMine);
+    const nonMineCells = flattenedBoard.filter(cell => !cell.isMine);
+    
+    // Get revealed cells
+    const revealedMineCells = mineCells.filter(cell => cell.isRevealed);
+    const revealedNonMineCells = nonMineCells.filter(cell => cell.isRevealed);
+    
+    // Win condition: All non-mine cells are revealed AND no mines are revealed
+    const hasWon = revealedNonMineCells.length === nonMineCells.length && revealedMineCells.length === 0;
+    
+    if (hasWon) {
+      setIsGameWon(true);
     }
   }
 
