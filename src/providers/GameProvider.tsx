@@ -201,7 +201,7 @@ function GameProvider({ children }: IGameProvider) {
 
   const handleRightClick = (row: number, col: number) => {
     const copyOfBoard = [...gameState];
-    copyOfBoard[row][col].isFlagged = true;
+    copyOfBoard[row][col].isFlagged = !copyOfBoard[row][col].isFlagged;
     setGameState(copyOfBoard);
   };
 
