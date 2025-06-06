@@ -45,11 +45,11 @@ const difficulties = [
 function DifficultyModal({ onSelectDifficulty }: DifficultyModalProps) {
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
-        <h1 className="text-4xl font-bold text-center mb-2 animate-pulse">
-          JUSTIN'S MINESWEEPER
+      <div className="bg-slate-950 border-slate-600 border rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
+        <h1 className="text-4xl text-slate-200 font-bold text-center mb-2 animate-pulse">
+        🚩 Lords of Minesweeper 💣
         </h1>
-        <h2 className="text-xl text-gray-600 text-center mb-6">
+        <h2 className="text-xl text-slate-500 text-center mb-6">
           Pick your difficulty
         </h2>
         <div className="space-y-3">

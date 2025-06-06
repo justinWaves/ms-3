@@ -65,26 +65,40 @@ function GameBoard() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-white p-4 sm:p-8">
+    <div className={`min-h-screen w-full p-4 sm:p-8 transition-colors duration-1000 ${isGameWon ? 'rainbow-bg' : 'bg-slate-950'}`}>
       {showDifficultyModal && (
         <DifficultyModal onSelectDifficulty={handleDifficultySelect} />
       )}
       <div className="flex flex-col items-center gap-6 w-full max-w-4xl mx-auto">
         {/* Navigation Bar */}
-        <div className="w-full bg-gray-800 rounded-lg p-4 shadow-lg flex items-center justify-between">
+        <div className="w-full bg-slate-800 rounded-lg p-4 shadow-lg flex items-center justify-between">
           {/* Timer */}
           <div className="bg-black text-red-500 font-mono text-2xl px-4 py-2 rounded">
             {formatNumber(timer)}
           </div>
 
-          {/* Face Button */}
-          <button
-            onClick={handleReset}
-            className="text-4xl hover:scale-110 transition-all duration-300 relative group"
-            title="Reset Game"
-          >
-            {getFaceEmoji()}
-          </button>
+          {/* Center Section with Emoji and Text */}
+          <div className="flex items-center gap-4">
+            {(isGameWon || isGameOver) && (
+              <span className="text-2xl font-bold text-white">
+                {isGameWon ? "YOU ARE" : "TRY"}
+              </span>
+            )}
+            
+            <button
+              onClick={handleReset}
+              className={`text-4xl hover:scale-110 transition-all duration-300 relative group ${isGameWon ? 'animate-spin-slow' : ''}`}
+              title="Reset Game"
+            >
+              {getFaceEmoji()}
+            </button>
+
+            {(isGameWon || isGameOver) && (
+              <span className="text-2xl font-bold text-white">
+                {isGameWon ? "AMAZING" : "AGAIN"}
+              </span>
+            )}
+          </div>
 
           {/* Move Counter */}
           <div className="bg-black text-red-500 font-mono text-2xl px-4 py-2 rounded">
@@ -93,7 +107,7 @@ function GameBoard() {
         </div>
 
         {/* Game Board */}
-        <div className="bg-white p-4 rounded-lg shadow-lg">
+        <div className="">
           <div className="inline-block">
             {gameState.map((row, rowIndex) => (
               <div key={rowIndex} className="flex">

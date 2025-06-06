@@ -117,7 +117,6 @@ function GameProvider({ children }: IGameProvider) {
     if (row - 1 >= 0 && col + 1 < width) neighbors.push([row - 1, col + 1]); //up right
     if (row + 1 < height && col - 1 >= 0) neighbors.push([row + 1, col - 1]); //down left
     if (row + 1 < height && col + 1 < width) neighbors.push([row + 1, col + 1]); //down right
-
     return neighbors;
   };
 
