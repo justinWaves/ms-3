@@ -3,19 +3,24 @@ import { useGameContext } from "../providers/GameProvider";
 import Cell from "./Cell";
 import DifficultyModal from "./DifficultyModal";
 import Confetti from 'react-confetti';
+import Bubbles from './Bubbles';
 
 function GameBoard() {
   const {
-    initializeBoard,
     gameState,
-    numberOfCols,
-    numberOfRows,
-    numberOfMines,
-    isGameWon,
     isGameOver,
-    setGameState,
-    setIsGameOver,
-    setIsGameWon,
+    isGameWon,
+    winMessage,
+    loseMessage,
+    handleLeftClick,
+    handleRightClick,
+    resetGame,
+    getFaceEmoji,
+    shouldShake,
+    initializeBoard,
+    numberOfRows,
+    numberOfCols,
+    numberOfMines
   } = useGameContext();
 
   const [timer, setTimer] = useState(0);
@@ -24,15 +29,14 @@ function GameBoard() {
   const [showDifficultyModal, setShowDifficultyModal] = useState(true);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
-    height: window.innerHeight,
+    height: window.innerHeight
   });
-  const [shouldShake, setShouldShake] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
       setWindowSize({
         width: window.innerWidth,
-        height: window.innerHeight,
+        height: window.innerHeight
       });
     };
 
@@ -50,26 +54,16 @@ function GameBoard() {
     return () => clearInterval(interval);
   }, [isTimerRunning, isGameOver, isGameWon]);
 
-  useEffect(() => {
-    if (isGameOver) {
-      setShouldShake(true);
-      const timer = setTimeout(() => setShouldShake(false), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [isGameOver]);
-
   const handleDifficultySelect = (rows: number, cols: number, mines: number) => {
-    const newGame = initializeBoard(rows, cols, mines);
-    setGameState(newGame as any);
+    initializeBoard(rows, cols, mines);
     setShowDifficultyModal(false);
     setTimer(0);
     setMoveCount(0);
     setIsTimerRunning(false);
-    setIsGameOver(false);
-    setIsGameWon(false);
   };
 
   const handleReset = () => {
+    resetGame();
     setShowDifficultyModal(true);
   };
 
@@ -80,18 +74,19 @@ function GameBoard() {
     setMoveCount((prev) => prev + 1);
   };
 
-  const getFaceEmoji = () => {
-    if (isGameWon) return "😎";
-    if (isGameOver) return "😭";
-    return "😀";
-  };
-
   const formatNumber = (num: number) => {
-    return num.toString().padStart(3, "0");
+    return num.toString().padStart(3, '0');
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-950">
+    <div className="fixed inset-0 bg-gradient-to-b from-sky-900 via-slate-900 to-slate-950">
+      {/* Ocean waves effect */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(56,189,248,0.1),transparent_50%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(56,189,248,0.05),transparent)] pointer-events-none" />
+      
+      {/* Floating bubbles */}
+      <Bubbles />
+      
       {isGameWon && (
         <Confetti
           width={windowSize.width}
@@ -101,26 +96,27 @@ function GameBoard() {
           gravity={0.2}
         />
       )}
+
       {showDifficultyModal && (
         <DifficultyModal onSelectDifficulty={handleDifficultySelect} />
       )}
-      
+
       {/* Fixed Navigation Bar */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-slate-950">
         <div className="w-full max-w-4xl mx-auto p-2 sm:p-4">
           <div className="bg-slate-800 rounded-lg p-2 sm:p-4 shadow-lg flex items-center justify-between">
             {/* Timer */}
-            <div className="bg-black text-red-500 font-mono text-xl sm:text-2xl px-2 sm:px-4 py-1 sm:py-2 rounded">
+            <div className="bg-black text-red-500 text-xl sm:text-2xl px-2 sm:px-4 py-1 sm:py-2 rounded">
               {formatNumber(timer)}
             </div>
 
             {/* Center Section with Emoji and Text */}
-            <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center justify-center gap-4">
               {(isGameWon || isGameOver) && (
-                <span className={`text-lg sm:text-2xl font-bold ${
+                <span className={`text-lg sm:text-2xl ${
                   isGameWon ? 'celebrate-text' : 'game-over-text'
                 }`}>
-                  {isGameWon ? "YOU ARE" : "TRY"}
+                  {isGameWon ? winMessage.left : loseMessage.left}
                 </span>
               )}
               
@@ -135,16 +131,16 @@ function GameBoard() {
               </button>
 
               {(isGameWon || isGameOver) && (
-                <span className={`text-lg sm:text-2xl font-bold ${
+                <span className={`text-lg sm:text-2xl ${
                   isGameWon ? 'celebrate-text' : 'game-over-text'
                 }`}>
-                  {isGameWon ? "AMAZING" : "AGAIN"}
+                  {isGameWon ? winMessage.right : loseMessage.right}
                 </span>
               )}
             </div>
 
             {/* Move Counter */}
-            <div className="bg-black text-red-500 font-mono text-xl sm:text-2xl px-2 sm:px-4 py-1 sm:py-2 rounded">
+            <div className="bg-black text-red-500 text-xl sm:text-2xl px-2 sm:px-4 py-1 sm:py-2 rounded">
               {formatNumber(moveCount)}
             </div>
           </div>
@@ -160,7 +156,7 @@ function GameBoard() {
                 {gameState.map((row, rowIndex) => (
                   <div key={rowIndex} className="flex">
                     {row.map((cell, cellIndex) => (
-                      <Cell 
+                      <Cell
                         key={cellIndex} 
                         {...cell}
                         onFirstClick={handleFirstMove}

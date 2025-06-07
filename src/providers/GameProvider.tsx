@@ -7,40 +7,50 @@ import React, {
 } from "react";
 import { ICell, IGameProvider } from "../types";
 
-interface IGameContext {
+interface GameContextType {
   gameState: ICell[][];
   numberOfRows: number;
   numberOfCols: number;
   numberOfMines: number;
   isGameOver: boolean;
   isGameWon: boolean;
+  winMessage: { left: string; right: string };
+  loseMessage: { left: string; right: string };
   setGameState: Dispatch<SetStateAction<ICell[][]>>;
   setNumberOfRows: Dispatch<SetStateAction<number>>;
   setNumberOfCols: Dispatch<SetStateAction<number>>;
   setNumberOfMines: Dispatch<SetStateAction<number>>;
   setIsGameOver: Dispatch<SetStateAction<boolean>>;
-  setIsGameWon:Dispatch<SetStateAction<boolean>>;
+  setIsGameWon: Dispatch<SetStateAction<boolean>>;
   initializeBoard: (rows: number, cols: number, numberOfMines: number) => void;
   handleLeftClick: (rows: number, cols: number) => void;
   handleRightClick: (rows: number, cols: number) => void;
+  resetGame: () => void;
+  getFaceEmoji: () => JSX.Element;
+  shouldShake: boolean;
 }
 
-const defaultContext: IGameContext = {
+const defaultContext: GameContextType = {
   gameState: [],
   numberOfRows: 10,
   numberOfCols: 10,
   numberOfMines: 10,
   isGameOver: false,
-  isGameWon:false,
+  isGameWon: false,
+  winMessage: { left: "", right: "" },
+  loseMessage: { left: "", right: "" },
   setGameState: () => {},
   setNumberOfRows: () => {},
   setNumberOfCols: () => {},
   setNumberOfMines: () => {},
-  initializeBoard: () => {},
   setIsGameOver: () => {},
-  setIsGameWon:() => {},
+  setIsGameWon: () => {},
+  initializeBoard: () => {},
   handleLeftClick: () => {},
   handleRightClick: () => {},
+  resetGame: () => {},
+  getFaceEmoji: () => <></>,
+  shouldShake: false,
 };
 
 const GameContext = createContext(defaultContext);
@@ -53,6 +63,9 @@ function GameProvider({ children }: IGameProvider) {
   const [numberOfMines, setNumberOfMines] = useState(defaultContext.numberOfMines);
   const [isGameOver, setIsGameOver] = useState(defaultContext.isGameOver);
   const [isGameWon, setIsGameWon] = useState(defaultContext.isGameWon);
+  const [winMessage, setWinMessage] = useState({ left: "", right: "" });
+  const [loseMessage, setLoseMessage] = useState({ left: "", right: "" });
+  const [shouldShake, setShouldShake] = useState(false);
 
   const createCell = (row: number, col: number) => {
     return {
@@ -83,6 +96,7 @@ function GameProvider({ children }: IGameProvider) {
 
     placeMines(numberOfMines, matrix);
     incrementValues(matrix);
+    setGameState(matrix);
     return matrix;
   };
 
@@ -177,12 +191,29 @@ function GameProvider({ children }: IGameProvider) {
     }
   };
 
+  const handleGameOver = () => {
+    const loseMessages = [
+      { left: "Wipe", right: "Out!" },
+      { left: "Epic", right: "Fail!" },
+      { left: "Shark", right: "Attack!" },
+      { left: "Wipe", right: "Out!" },
+      { left: "Bail", right: "Out!" },
+      { left: "Total", right: "Wipeout!" },
+      { left: "Rough", right: "Seas!" },
+      { left: "Crashed", right: "& Burned!" }
+    ];
+    const randomMessage = loseMessages[Math.floor(Math.random() * loseMessages.length)];
+    setLoseMessage(randomMessage);
+    setIsGameOver(true);
+    setShouldShake(true);
+  };
+
   const handleLeftClick = (row: number, col: number) => {
     const copyOfBoard = [...gameState];
     
     // Handle first move
     if (copyOfBoard[row][col].isMine) {
-      setIsGameOver(true);
+      handleGameOver();
       expandAllCells();
       return;
     }
@@ -200,9 +231,16 @@ function GameProvider({ children }: IGameProvider) {
   };
 
   const handleRightClick = (row: number, col: number) => {
-    const copyOfBoard = [...gameState];
-    copyOfBoard[row][col].isFlagged = !copyOfBoard[row][col].isFlagged;
-    setGameState(copyOfBoard);
+    if (isGameOver || isGameWon) return;
+    
+    const copyOfBoard = gameState.map(row => [...row]);
+    const cell = copyOfBoard[row][col];
+    
+    if (!cell.isRevealed) {
+      cell.isFlagged = !cell.isFlagged;
+      setGameState(copyOfBoard);
+      checkForWin();
+    }
   };
 
   const expandAllCells = () => {
@@ -233,9 +271,49 @@ function GameProvider({ children }: IGameProvider) {
     const hasWon = revealedNonMineCells.length === nonMineCells.length && revealedMineCells.length === 0;
     
     if (hasWon) {
-      setIsGameWon(true);
+      handleWin();
     }
   }
+
+  const handleWin = () => {
+    const winMessages = [
+      { left: "Totally", right: "Tubular!" },
+      { left: "Shredding", right: "It!" },
+      { left: "Epic", right: "Wave!" },
+      { left: "Stoked", right: "Dude!" },
+      { left: "Perfect", right: "Pipeline!" }
+    ];
+    const randomMessage = winMessages[Math.floor(Math.random() * winMessages.length)];
+    setWinMessage(randomMessage);
+    setIsGameWon(true);
+    setShouldShake(false);
+  };
+
+  const getFaceEmoji = () => {
+    if (isGameWon) {
+      return (
+        <div className="flex items-center gap-2">
+          <span>😎</span>
+          <span className="text-sm font-medium">{winMessage.left} {winMessage.right}</span>
+        </div>
+      );
+    }
+    if (isGameOver) return <span>😵</span>;
+    return <span>😊</span>;
+  };
+
+  const handleClick = (rows: number, cols: number) => {
+    // Implementation of handleClick
+  };
+
+  const resetGame = () => {
+    setGameState([]);
+    setIsGameOver(false);
+    setIsGameWon(false);
+    setShouldShake(false);
+    setWinMessage({ left: "", right: "" });
+    // Implementation of resetGame
+  };
 
   return (
     <GameContext.Provider
@@ -246,15 +324,20 @@ function GameProvider({ children }: IGameProvider) {
         numberOfMines,
         isGameOver,
         isGameWon,
-        setIsGameWon,
+        winMessage,
+        loseMessage,
         setGameState,
         setNumberOfRows,
         setNumberOfCols,
         setNumberOfMines,
-        initializeBoard,
         setIsGameOver,
+        setIsGameWon,
+        initializeBoard,
         handleLeftClick,
         handleRightClick,
+        resetGame,
+        getFaceEmoji,
+        shouldShake,
       }}
     >
       {children}

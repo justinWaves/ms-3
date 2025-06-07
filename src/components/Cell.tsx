@@ -17,10 +17,11 @@ const Cell: React.FC<CellProps> = ({
 }) => {
   const { handleLeftClick, handleRightClick } = useGameContext();
 
-  const handleClick = () => {
+  const handleCellClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     if (!isRevealed && !isFlagged) {
-      onFirstClick();
       handleLeftClick(row, col);
+      onFirstClick();
     }
   };
 
@@ -31,14 +32,6 @@ const Cell: React.FC<CellProps> = ({
     }
   };
 
-  const getCellContent = () => {
-    if (isFlagged) return "🚩";
-    if (!isRevealed) return "";
-    if (isMine) return "💣";
-    if (value === 0) return "";
-    return value.toString();
-  };
-
   const getCellColor = () => {
     if (!isRevealed) return "bg-slate-700";
     if (isMine) return "bg-red-500";
@@ -47,8 +40,11 @@ const Cell: React.FC<CellProps> = ({
   };
 
   const getTextColor = () => {
-    if (!isRevealed) return "text-white";
+    if (!isRevealed && !isFlagged) return "text-transparent";
     if (isMine) return "text-white";
+    if (value === 0) return "text-transparent";
+    
+    // Add color based on number value
     switch (value) {
       case 1: return "text-blue-400";
       case 2: return "text-green-400";
@@ -76,11 +72,26 @@ const Cell: React.FC<CellProps> = ({
         transition-colors duration-200
         hover:bg-slate-600
         active:bg-slate-500
+        water-ripple
       `}
-      onClick={handleClick}
+      onClick={handleCellClick}
       onContextMenu={handleContextMenu}
     >
-      {getCellContent()}
+      {isRevealed && isMine && (
+        <div className="flex items-center justify-center h-full w-full text-2xl">
+          🦈
+        </div>
+      )}
+      {isRevealed && !isMine && (
+        <div className="flex items-center justify-center h-full w-full text-2xl">
+          {value > 0 ? value : ''}
+        </div>
+      )}
+      {!isRevealed && isFlagged && (
+        <div className="flex items-center justify-center h-full w-full text-2xl text-white">
+          🌊
+        </div>
+      )}
     </div>
   );
 };

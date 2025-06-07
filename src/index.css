@@ -1,6 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  font-family: 'Permanent Marker', cursive;
+  line-height: 1.5;
+  font-weight: 400;
+}
 
 body {
   margin: 0;
@@ -122,9 +130,9 @@ code {
 }
 
 .celebrate-text {
-  animation: celebrate-text 1s ease-in-out infinite;
-  color: #fff;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  color: #fbbf24;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+  font-family: 'Permanent Marker', cursive;
 }
 
 @keyframes game-over-text {
@@ -143,7 +151,142 @@ code {
 }
 
 .game-over-text {
-  animation: game-over-text 1s ease-in-out infinite;
   color: #ef4444;
   text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+  font-family: 'Permanent Marker', cursive;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.water-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.water-ripple::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  background: rgba(56, 189, 248, 0.6);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%);
+  transform-origin: 50% 50%;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+}
+
+.water-ripple:active::after {
+  animation: ripple 1s ease-out;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(-25vh) translateX(10px);
+  }
+  50% {
+    transform: translateY(-50vh) translateX(-5px);
+  }
+  75% {
+    transform: translateY(-75vh) translateX(5px);
+  }
+  100% {
+    transform: translateY(-100vh) translateX(0);
+  }
+}
+
+/* Update the timer and move counter to use the new font */
+.font-mono {
+  font-family: 'Permanent Marker', cursive;
+}
+
+/* Add styles for the difficulty modal */
+.difficulty-modal h1,
+.difficulty-modal h2,
+.difficulty-modal button {
+  font-family: 'Permanent Marker', cursive;
+}
+
+@keyframes wave {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes float-wave {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-10px) translateX(5px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+}
+
+.animate-wave {
+  animation: wave 2s linear infinite;
+}
+
+.animate-float-wave {
+  animation: float-wave 3s ease-in-out infinite;
+}
+
+/* Game board wave effects */
+.game-board-waves {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.wave-layer {
+  position: absolute;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.1), transparent);
+  animation: wave 8s linear infinite;
+}
+
+.wave-layer:nth-child(2) {
+  top: 20%;
+  animation-duration: 12s;
+  opacity: 0.5;
+}
+
+.wave-layer:nth-child(3) {
+  top: 40%;
+  animation-duration: 16s;
+  opacity: 0.3;
+}
+
+/* Cell hover effects */
+.cell-hover-wave {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(56, 189, 248, 0.2), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.cell:hover .cell-hover-wave {
+  opacity: 1;
 }
