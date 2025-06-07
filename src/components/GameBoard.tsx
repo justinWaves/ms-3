@@ -102,9 +102,9 @@ function GameBoard() {
       )}
 
       {/* Fixed Navigation Bar */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-slate-950">
+      <div className="fixed top-0 left-0 right-0 z-50 ">
         <div className="w-full max-w-4xl mx-auto p-2 sm:p-4">
-          <div className="bg-slate-800 rounded-lg p-2 sm:p-4 shadow-lg flex items-center justify-between">
+          <div className="bg-slate-900 rounded-lg p-2 sm:p-4 shadow-lg flex items-center justify-between">
             {/* Timer */}
             <div className="bg-black text-red-500 text-xl sm:text-2xl px-2 sm:px-4 py-1 sm:py-2 rounded">
               {formatNumber(timer)}
