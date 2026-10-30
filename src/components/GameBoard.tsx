@@ -122,12 +122,13 @@ function GameBoard() {
               
               <button
                 onClick={handleReset}
-                className={`text-3xl sm:text-4xl hover:scale-110 transition-all duration-300 relative group ${
-                  isGameWon ? 'animate-spin-slow' : ''
-                }`}
+                className="text-3xl sm:text-4xl hover:scale-110 transition-all duration-300 relative group"
                 title="Reset Game"
               >
-                {getFaceEmoji()}
+                {/* Spin only the face, not the button, so nothing else rotates with it */}
+                <span className={`inline-block ${isGameWon ? 'animate-spin-slow' : ''}`}>
+                  {getFaceEmoji()}
+                </span>
               </button>
 
               {(isGameWon || isGameOver) && (

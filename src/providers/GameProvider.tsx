@@ -290,14 +290,7 @@ function GameProvider({ children }: IGameProvider) {
   };
 
   const getFaceEmoji = () => {
-    if (isGameWon) {
-      return (
-        <div className="flex items-center gap-2">
-          <span>😎</span>
-          <span className="text-sm font-medium">{winMessage.left} {winMessage.right}</span>
-        </div>
-      );
-    }
+    if (isGameWon) return <span>😎</span>;
     if (isGameOver) return <span>😵</span>;
     return <span>😊</span>;
   };
