@@ -18,7 +18,7 @@ function boardWithMines(rows: number, cols: number, mineAt: number[]): Game {
     open: false,
     flag: false,
   }));
-  return { rows, cols, mines: mineAt.length, cells, status: "playing", flags: 0, opened: 0, boom: null };
+  return { rows, cols, mines: mineAt.length, cells, status: "playing", flags: 0, opened: 0, boom: null, placed: true };
 }
 
 describe("first reveal", () => {

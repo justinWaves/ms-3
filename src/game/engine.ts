@@ -34,6 +34,15 @@ export interface Game extends BoardConfig {
   opened: number;
   /** The mine that ended the game. */
   boom: number | null;
+  /** False until mines exist. Free play places them on the first reveal. */
+  placed: boolean;
+}
+
+export type MoveType = "reveal" | "flag" | "chord";
+
+export interface Move {
+  type: MoveType;
+  i: number;
 }
 
 const EMPTY_CELL: Cell = { mine: false, n: 0, open: false, flag: false };
@@ -48,6 +57,7 @@ export function createGame({ rows, cols, mines }: BoardConfig): Game {
     flags: 0,
     opened: 0,
     boom: null,
+    placed: false,
   };
 }
 
@@ -66,12 +76,11 @@ export function neighbors(i: number, rows: number, cols: number): number[] {
   return out;
 }
 
-/** Places mines on the first reveal, keeping the clicked cell and its neighbors clear. */
-function placeMines(game: Game, safe: number, random: () => number): Cell[] {
-  const { rows, cols, mines } = game;
+/** Picks mine positions, keeping `safe` and its neighbors clear. */
+export function chooseMines({ rows, cols, mines }: BoardConfig, safe: number, random: () => number): Set<number> {
   const banned = new Set([safe, ...neighbors(safe, rows, cols)]);
   const pool: number[] = [];
-  for (let i = 0; i < game.cells.length; i++) if (!banned.has(i)) pool.push(i);
+  for (let i = 0; i < rows * cols; i++) if (!banned.has(i)) pool.push(i);
 
   const mineAt = new Set<number>();
   for (let m = 0; m < mines; m++) {
@@ -79,11 +88,23 @@ function placeMines(game: Game, safe: number, random: () => number): Cell[] {
     [pool[m], pool[j]] = [pool[j], pool[m]];
     mineAt.add(pool[m]);
   }
+  return mineAt;
+}
+
+function withMines(game: Game, mineAt: Set<number>): Cell[] {
   return game.cells.map((cell, i) => ({
     ...cell,
     mine: mineAt.has(i),
-    n: neighbors(i, rows, cols).filter((k) => mineAt.has(k)).length,
+    n: neighbors(i, game.rows, game.cols).filter((k) => mineAt.has(k)).length,
   }));
+}
+
+/** A board with known mines and `start` already open, so every player gets the same game. */
+export function createFixedGame(config: BoardConfig, mineAt: Set<number>, start: number): Game {
+  const blank = createGame(config);
+  const cells = withMines(blank, mineAt);
+  const opened = floodOpen(blank, cells, start);
+  return { ...blank, cells, opened, placed: true };
 }
 
 /** Opens cells in place on `cells`, which the caller must already own. */
@@ -105,13 +126,13 @@ export function reveal(game: Game, i: number, random: () => number = Math.random
   if (game.status === "won" || game.status === "lost") return game;
   if (game.cells[i].open || game.cells[i].flag) return game;
 
-  const cells = game.status === "ready" ? placeMines(game, i, random) : game.cells.slice();
+  const cells = game.placed ? game.cells.slice() : withMines(game, chooseMines(game, i, random));
 
   if (cells[i].mine) {
     cells.forEach((cell, j) => {
       if (cell.mine && !cell.flag) cells[j] = { ...cell, open: true };
     });
-    return { ...game, cells, status: "lost", boom: i };
+    return { ...game, cells, status: "lost", boom: i, placed: true };
   }
 
   const opened = game.opened + floodOpen(game, cells, i);
@@ -119,9 +140,9 @@ export function reveal(game: Game, i: number, random: () => number = Math.random
     cells.forEach((cell, j) => {
       if (cell.mine && !cell.flag) cells[j] = { ...cell, flag: true };
     });
-    return { ...game, cells, opened, status: "won", flags: game.mines };
+    return { ...game, cells, opened, status: "won", flags: game.mines, placed: true };
   }
-  return { ...game, cells, opened, status: "playing" };
+  return { ...game, cells, opened, status: "playing", placed: true };
 }
 
 export function toggleFlag(game: Game, i: number): Game {
@@ -135,10 +156,16 @@ export function toggleFlag(game: Game, i: number): Game {
 
 /** Clicking a number whose surrounding flags already match it opens the rest around it. */
 export function chord(game: Game, i: number): Game {
-  if (game.status !== "playing") return game;
+  if (game.status === "won" || game.status === "lost") return game;
   const cell = game.cells[i];
   if (!cell.open || cell.n === 0) return game;
   const around = neighbors(i, game.rows, game.cols);
   if (around.filter((k) => game.cells[k].flag).length !== cell.n) return game;
   return around.reduce((next, k) => reveal(next, k), game);
+}
+
+export function applyMove(game: Game, { type, i }: Move): Game {
+  if (type === "reveal") return reveal(game, i);
+  if (type === "flag") return toggleFlag(game, i);
+  return chord(game, i);
 }

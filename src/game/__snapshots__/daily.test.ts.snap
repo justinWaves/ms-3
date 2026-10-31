@@ -1,0 +1,59 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`createDailyGame > keeps these boards unchanged, because results are replayed against them 1`] = `
+[
+  0,
+  6,
+  15,
+  16,
+  20,
+  25,
+  32,
+  36,
+  38,
+  41,
+  43,
+  50,
+  51,
+  60,
+  69,
+  92,
+  104,
+  106,
+  110,
+  122,
+  128,
+  134,
+  136,
+  139,
+]
+`;
+
+exports[`createDailyGame > keeps these boards unchanged, because results are replayed against them 2`] = `
+[
+  0,
+  4,
+  5,
+  11,
+  13,
+  16,
+  21,
+  31,
+  35,
+  45,
+  47,
+  54,
+  63,
+  77,
+  82,
+  86,
+  88,
+  93,
+  94,
+  104,
+  109,
+  118,
+  123,
+  138,
+]
+`;
