@@ -137,6 +137,7 @@ button { font: inherit; color: inherit; }
 .cell:hover:not(.open) { background-color: var(--sea-hi); }
 .cell:focus-visible { outline: 3px solid var(--sun); outline-offset: -3px; position: relative; z-index: 1; }
 .cell svg { width: 72%; height: 72%; display: block; }
+.cell .shark-fin { width: 84%; height: 84%; }
 .cell.open { background: var(--tile-open); box-shadow: none; cursor: default; }
 .n1 { color: var(--n1); } .n2 { color: var(--n2); } .n3 { color: var(--n3); } .n4 { color: var(--n4); }
 .n5 { color: var(--n5); } .n6 { color: var(--n6); } .n7 { color: var(--n7); } .n8 { color: var(--n8); }
@@ -282,3 +283,39 @@ button { font: inherit; color: inherit; }
 }
 .row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .form-error { color: var(--coral); font-size: 14px; font-weight: 700; }
+
+/* A freshly earned win gets its own surf-poster moment. */
+.victory {
+  width: min(510px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow-x: hidden;
+  padding: 32px 28px 26px; border: 3px solid var(--line); border-radius: 24px;
+  color: var(--fg); background: radial-gradient(ellipse at 50% 12%, color-mix(in srgb, var(--sun) 25%, transparent), transparent 65%), var(--card);
+  text-align: center; box-shadow: 9px 10px 0 var(--shadow), 0 24px 100px #0005;
+  animation: victory-arrive .55s cubic-bezier(.2, 1.45, .4, 1) both;
+}
+.victory::backdrop { background: #061821aa; backdrop-filter: blur(5px); }
+.victory-close { position: absolute; z-index: 2; top: 12px; right: 12px; width: 44px; height: 44px; border: 0; background: transparent; color: var(--fg); font: 30px var(--body); cursor: pointer; }
+.victory-sun { width: 112px; height: 112px; margin: 0 auto 10px; position: relative; }
+.victory-sun svg { width: 100%; height: 100%; overflow: visible; }
+.victory-sun .f { display: none; fill: #17324A; }
+.victory-sun .f-win { display: inline; }
+.victory-sun .stroke { fill: none; stroke: #17324A; stroke-width: 2.6; stroke-linecap: round; }
+.victory-sun .rays { animation: spin 9s linear 1; }
+.victory-eyebrow { margin: 0 0 8px; text-transform: uppercase; letter-spacing: .15em; font-size: 11px; font-weight: 800; }
+.victory h2 { position: relative; margin: 0 0 12px; font: clamp(33px, 7vw, 44px)/1.1 var(--display); color: var(--coral); }
+.victory #victory-description { position: relative; margin: 0; line-height: 1.6; font-size: 15px; }
+.victory-score { display: grid; justify-items: center; margin: 18px 0 12px; }
+.victory-score strong { font-size: 54px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; letter-spacing: -.05em; }
+.victory-score strong span { font-size: 24px; margin-left: 4px; }
+.victory-score > span { font-size: 13px; color: var(--muted); }
+.victory-badge { display: inline-block; margin: 0 0 8px; border: 2px solid var(--line); border-radius: 50px; padding: 5px 14px; background: var(--sun); color: #17324A; font-size: 13px; font-weight: 800; transform: rotate(-3deg); }
+.victory-actions { position: relative; display: grid; justify-items: center; gap: 8px; margin-top: 18px; }
+.victory-actions .btn { background: var(--coral); color: var(--on-coral); min-height: 48px; }
+.victory-board { border: 0; background: transparent; color: var(--fg); font: inherit; padding: 10px 14px; cursor: pointer; text-underline-offset: 4px; }
+.victory-board:hover { text-decoration: underline; }
+.victory-confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; border-radius: inherit; }
+.victory-confetti i { position: absolute; top: -16px; width: 9px; height: 15px; border-radius: 2px; animation: victory-confetti 2.6s ease-out var(--delay) both; }
+.victory-confetti i:nth-child(3n) { width: 10px; height: 10px; border-radius: 50%; }
+@keyframes victory-arrive { from { opacity: 0; transform: translateY(24px) scale(.85) rotate(-3deg); } to { opacity: 1; transform: none; } }
+@keyframes victory-confetti { 0% { opacity: 1; transform: translateY(-30px) rotate(0); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--drift), 620px) rotate(var(--turn)); } }
+@media (max-width: 560px) { .victory { padding: 24px 18px 18px; } .victory-sun { width: 88px; height: 88px; } }
+@media (prefers-reduced-motion: reduce) { .victory-confetti { display: none; } .victory::backdrop { backdrop-filter: none; } }

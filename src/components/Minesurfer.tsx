@@ -19,6 +19,7 @@ import { sendRide, sendUnsentRide, startRide } from "@/lib/rides";
 import { useAccount } from "@/lib/useAccount";
 import { AccountDialog, HandleDialog, SignInDialog } from "./Account";
 import Board from "./Board";
+import Victory from "./Victory";
 import { FaceState, Fin, Stopwatch, SunFace, SunLogo, Surfboard } from "./Icons";
 import Rankings from "./Rankings";
 
@@ -130,6 +131,7 @@ export default function Minesurfer() {
   const [bests, setBests] = useState<Bests>({});
   const [resultLine, setResultLine] = useState("");
   const [newBest, setNewBest] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [coarse, setCoarse] = useState(false);
   /** Null until mounted: the page is prerendered, so the build can't know today's date. */
@@ -148,6 +150,7 @@ export default function Minesurfer() {
   const runRef = useRef<DailyRun | null>(null);
 
   const resetRound = () => {
+    setCelebrating(false);
     setRound((r) => r + 1);
     setNewBest(false);
     setRideNote(null);
@@ -365,6 +368,7 @@ export default function Minesurfer() {
 
     if (next.status === "won" || next.status === "lost") {
       setStoppedMs(elapsed);
+      if (next.status === "won") setCelebrating(true);
       setResultLine(pick(next.status === "won" ? WIN_LINES : LOSE_LINES));
       if (next.status === "won" && mode === "free") {
         const tenths = roundToTenths(elapsed);
@@ -433,6 +437,7 @@ export default function Minesurfer() {
       setTimeout(() => setCopied(false), COPIED_MS);
     } catch {
       setShareFallback(text);
+      setCelebrating(false);
     }
   };
 
@@ -467,6 +472,18 @@ export default function Minesurfer() {
             void signOut();
             setRankingsVersion((v) => v + 1);
           }}
+        />
+      )}
+      {celebrating && game.status === "won" && (
+        <Victory
+          wave={mode === "daily" ? `Daily Wave #${waveNumber(shownDate ?? utcDate())}` : DIFFICULTIES[difficulty].name}
+          time={formatTime(stoppedMs ?? 0)}
+          newBest={newBest}
+          daily={mode === "daily"}
+          copied={copied}
+          onClose={() => setCelebrating(false)}
+          onAgain={() => startGame(difficulty)}
+          onShare={shareResult}
         />
       )}
       <header className="top">
