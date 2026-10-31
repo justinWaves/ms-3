@@ -1,15 +1,13 @@
 export type FaceState = "play" | "gasp" | "win" | "lose";
 
+/** A swept-back dorsal fin: convex leading edge, deeply scooped trailing edge.
+ * No continuous wave under it, which can read as a sailboat hull at tile size. */
 export function Fin() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4 17C9 15.5 11.5 10 12.5 4c2 5.5 4.5 10 8 13z" fill="currentColor" />
+    <svg className="shark-fin" viewBox="0 0 24 24" aria-hidden="true">
       <path
-        d="M2 19.8c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
+        d="M3 19C7.5 16 6.8 7 18.2 2.8C15.3 7.2 13.3 13.6 21 19Z"
+        fill="currentColor"
       />
     </svg>
   );
