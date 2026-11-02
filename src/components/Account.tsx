@@ -71,6 +71,7 @@ export function SignInDialog({ failed, onClose }: { failed: boolean; onClose: ()
     setSending(false);
     if (!error) setSentTo(email.trim());
     else if (error.status === 429) setError("Too many sign-in emails right now. Try again in a little while.");
+    else if (error.status && error.status >= 500) setError("We couldn't send the email just now. Try again in a little while.");
     else setError("Couldn't send that. Check the address and try again.");
   };
 
